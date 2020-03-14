@@ -67,7 +67,7 @@
       // }
 
       // Run terraform show
-      // node("jenkins-pipeline-pod") {
+      // node("jenkins-slave") {
         stage("show") {
           withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
