@@ -3,18 +3,18 @@
 
   try 
   {
-        node("jenkins-slave") 
-        {
+       // node("jenkins-slave") 
+       // {
             stage("checkout") 
             {
                //cleanWs()
                checkout scm
             }
-        }
+      //  }
 
       // Run terraform init
-        node("jenkins-slave") 
-        {
+      //  node("jenkins-slave") 
+      //  {
             stage("init") 
             {
                 withCredentials([[
@@ -34,11 +34,11 @@
                     }
                 }
             }
-        }
+       // }
 
       // Run terraform plan
-       node("jenkins-slave") 
-       {
+      // node("jenkins-slave") 
+      // {
           stage("plan") 
           {
               withCredentials([[
@@ -57,13 +57,13 @@
                   }
               }
           }
-      }
+     // }
 
       if (env.BRANCH_NAME == 'master') 
       {
           // Run terraform apply
-          node("jenkins-slave") 
-          {
+         // node("jenkins-slave") 
+         // {
               stage("apply") 
               {
                   withCredentials([[
@@ -82,11 +82,11 @@
                       }
                   }
               }
-          }
+         // }
 
         // Run terraform show
-          node("jenkins-slave") 
-          {
+        //  node("jenkins-slave") 
+        //  {
               stage("show") 
               {
                   withCredentials([[
@@ -105,7 +105,7 @@
                       }
                   }
               }
-          }
+          //}
       }
         currentBuild.result = 'SUCCESS'
   }
