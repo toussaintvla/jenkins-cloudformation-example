@@ -1,0 +1,127 @@
+// Scripted Pipeline
+  String credentialsId = 'awsCredentials'
+
+  try 
+  {
+        node("jenkins-slave") 
+        {
+            stage("checkout") 
+            {
+               //cleanWs()
+               checkout scm
+            }
+        }
+
+      // Run terraform init
+        node("jenkins-slave") 
+        {
+            stage("init") 
+            {
+                withCredentials([[
+                  $class: 'AmazonWebServicesCredentialsBinding',
+                  credentialsId: credentialsId,
+                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) 
+                {
+                    ansiColor('xterm') 
+                    {
+                        container("jnlp") 
+                        {
+                          sh 'ls -la'
+                          sh 'terraform init'
+                        }
+                    }
+                }
+            }
+        }
+
+      // Run terraform plan
+       node("jenkins-slave") 
+       {
+          stage("plan") 
+          {
+              withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                credentialsId: credentialsId,
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+              ]]) 
+              {
+                  ansiColor('xterm') 
+                  {
+                      container("jnlp") 
+                      {
+                        sh 'terraform plan'
+                      }
+                  }
+              }
+          }
+      }
+
+      if (env.BRANCH_NAME == 'master') 
+      {
+          // Run terraform apply
+          node("jenkins-slave") 
+          {
+              stage("apply") 
+              {
+                  withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: credentialsId,
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                  ]]) 
+                  {
+                      ansiColor('xterm') 
+                      {
+                          container("jnlp") 
+                          {
+                            sh 'terraform apply -auto-approve'
+                          }
+                      }
+                  }
+              }
+          }
+
+        // Run terraform show
+          node("jenkins-slave") 
+          {
+              stage("show") 
+              {
+                  withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: credentialsId,
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                  ]]) 
+                  {
+                      ansiColor('xterm') 
+                      {
+                          container("jnlp") 
+                          {
+                            sh 'terraform show'
+                          }
+                      }
+                  }
+              }
+          }
+      }
+        currentBuild.result = 'SUCCESS'
+  }
+  catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException flowError) 
+  {
+    currentBuild.result = 'ABORTED'
+  }
+  catch (err) 
+  {
+    currentBuild.result = 'FAILURE'
+    throw err
+  }
+  finally 
+  {
+      if (currentBuild.result == 'SUCCESS') 
+      {
+        currentBuild.result = 'SUCCESS'
+      }
+  }
