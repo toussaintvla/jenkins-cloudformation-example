@@ -15,24 +15,58 @@ spec:
     command:
     - cat
     tty: true
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi
   - name: busybox
     image: busybox
     command:
     - cat
     tty: true
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi
   - name: terraform
     image: hashicorp/terraform:0.11.6
     command:
     - cat
     tty: true
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi
   - name: aws-cli
     image: mesosphere/aws-cli
     command:
     - cat
     tty: true
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi
   - name: docker
     image: docker
     command:
     - cat
     tty: true
-    
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi

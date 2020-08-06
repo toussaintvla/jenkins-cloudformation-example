@@ -1,3 +1,3 @@
 # bucketname = "testing-slave" 
-ip = "10.255.10.29"
-subnet_id = "subnet-09f9cdf241d796ecf"
+ip = "10.211.201.27"
+subnet_id = "subnet-08fe5f58c43f6fa3b"

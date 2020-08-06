@@ -5,7 +5,15 @@ provider "aws" {
   # }
 }
 
-resource "aws_network_interface" "foo" {
+variable "ip" {
+  type = "string"
+}
+
+variable "subnet_id" {
+  type = "string"
+}
+
+resource "aws_network_interface" "eni" {
   subnet_id   = "${var.subnet_id}"
   private_ips = ["${var.ip}"]
 
@@ -19,7 +27,7 @@ resource "aws_instance" "foo" {
   instance_type = "t2.micro"
 
   network_interface {
-    network_interface_id = "${aws_network_interface.foo.id}"
+    network_interface_id = "${aws_network_interface.eni.id}"
     device_index         = 0
   }
 

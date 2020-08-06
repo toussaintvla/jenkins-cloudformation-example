@@ -11,12 +11,14 @@ spec:
     runAsNonRoot: false
   containers:
   - name: custom-image
-    image: docker.io/tpatrick1496/jenkins-slave:1.0
+    image: docker.io/tpatrick1496/jenkins-agent:latest
     command:
     - cat
     tty: true
-  - name: custom-image2
-    image: docker.io/partha2019/efx-jenkins-slave:1.1
-    command:
-    - cat
-    tty: true
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi

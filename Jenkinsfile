@@ -7,7 +7,6 @@ pipeline {
   }  
 
   environment {
-    credentialsId = 'awsCredentials'
     var = 'sample.tfvars'
   }
 
@@ -33,19 +32,11 @@ pipeline {
       stage('init'){
         steps {
           ansiColor('xterm'){
-            withCredentials([[
-              $class: 'AmazonWebServicesCredentialsBinding',
-              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-              credentialsId: "${credentialsId}",
-              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-              ]])
-              {
-                container("custom-image") {
-                // cleanWs()
-                  sh 'aws sts get-caller-identity'
-                  sh 'terraform init'
-                }
-              }
+              container("custom-image") {
+              // cleanWs()
+                sh 'aws sts get-caller-identity'
+                sh 'terraform init'
+              } 
             }
           }
         }
@@ -56,17 +47,10 @@ pipeline {
           }
 
           steps {
-            ansiColor('xterm'){
-              withCredentials([[
-                $class: 'AmazonWebServicesCredentialsBinding',
-                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                credentialsId: "${credentialsId}",
-                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                {
-                  container("custom-image") {
-                    sh 'terraform validate --var-file=${var}'
-                  }
-                }
+            ansiColor('xterm'){ 
+                container("custom-image") {
+                  sh 'terraform validate --var-file=${var}'
+                } 
               }
             }
           }
@@ -78,15 +62,8 @@ pipeline {
 
             steps {
               ansiColor('xterm'){
-                withCredentials([[
-                  $class: 'AmazonWebServicesCredentialsBinding',
-                  accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                  credentialsId: "${credentialsId}",
-                  secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                  {
-                    container("custom-image") {
-                      sh 'terraform plan --var-file=${var}'
-                    }
+                  container("custom-image") {
+                    sh 'terraform plan --var-file=${var}'
                   }
                 }
               }
@@ -97,17 +74,10 @@ pipeline {
               }
               steps {
                 ansiColor('xterm'){
-                  withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    credentialsId: "${credentialsId}",
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                    {
-                      container("custom-image") {
-                        sh 'aws sts get-caller-identity'
-                        sh 'terraform plan --var-file=${var}'
-                        sh 'terraform apply -auto-approve --var-file=${var}'
-                      }
+                    container("custom-image") {
+                      sh 'aws sts get-caller-identity'
+                      sh 'terraform plan --var-file=${var}'
+                      sh 'terraform apply -auto-approve --var-file=${var}'
                     }
                   }
                 }
@@ -119,15 +89,8 @@ pipeline {
                 }
                 steps {
                   ansiColor('xterm'){
-                    withCredentials([[
-                      $class: 'AmazonWebServicesCredentialsBinding',
-                      accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                      credentialsId: "${credentialsId}",
-                      secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                      {
-                        container("custom-image") {
-                          sh 'terraform show'
-                        }
+                      container("custom-image") {
+                        sh 'terraform show'
                       }
                     }
                   }
@@ -139,15 +102,8 @@ pipeline {
                   }
                   steps {
                     ansiColor('xterm'){
-                      withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        credentialsId: "${credentialsId}",
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                        {
-                          container("custom-image") {
-                            sh 'terraform plan -destroy --var-file=${var}'
-                          }
+                        container("custom-image") {
+                          sh 'terraform plan -destroy --var-file=${var}'
                         }
                       }
                     }
@@ -159,15 +115,8 @@ pipeline {
                     }
                     steps {
                       ansiColor('xterm'){
-                        withCredentials([[
-                          $class: 'AmazonWebServicesCredentialsBinding',
-                          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                          credentialsId: "${credentialsId}",
-                          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']])
-                          {
-                            container("custom-image") {
-                              sh 'terraform destroy -force --var-file=${var}'
-                            }
+                          container("custom-image") {
+                            sh 'terraform destroy -force --var-file=${var}'
                           }
                         }
                       }
