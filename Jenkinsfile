@@ -40,33 +40,34 @@ pipeline {
       when {
         expression { params.action == 'deploy-stack' || params.action == 'delete-stack' }
       }
-    }
+    
 
-    stage('deploy-stack') {
-      when {
-        expression { params.action == 'deploy-stack' }
-      }
-      steps {
-        ansiColor('xterm') {
-            container("custom-image") {
-              sh 'cd scripts/'
-              sh './deploy-stack.sh prerequisite prerequisite default'
+        stage('deploy-stack') {
+          when {
+            expression { params.action == 'deploy-stack' }
+          }
+          steps {
+            ansiColor('xterm') {
+                container("custom-image") {
+                  sh 'cd scripts/'
+                  sh './deploy-stack.sh prerequisite prerequisite default'
+              }
+            }
           }
         }
-      }
-    }
 
-    stage('delete-stack') {
-      when {
-        expression { params.action == 'delete-stack' }
-      }
-      steps {
-        ansiColor('xterm') {
-          container("custom-image") {
-            sh './delete-stack.sh prerequisite default'
+        stage('delete-stack') {
+          when {
+            expression { params.action == 'delete-stack' }
+          }
+          steps {
+            ansiColor('xterm') {
+              container("custom-image") {
+                sh './delete-stack.sh prerequisite default'
+              }
+            }
           }
         }
-      }
     }
   }
 }
