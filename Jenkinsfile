@@ -74,7 +74,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${condition}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template} !${condition}'
           }
         }
       }
