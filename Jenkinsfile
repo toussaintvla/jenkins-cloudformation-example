@@ -35,7 +35,7 @@ pipeline {
               container("custom-image") {
               // cleanWs()
                 sh 'aws sts get-caller-identity'
-                sh 'terraform init'
+                sh 'terraform init -reconfigure'
               } 
             }
           }
