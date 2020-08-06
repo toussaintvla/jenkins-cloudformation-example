@@ -14,7 +14,8 @@ pipeline {
   }
 
   environment {
-    condition = false
+    cd1 = true
+    cd2 = false
     stack_name = "prerequisite"
     template = "prerequisite"
   }
@@ -61,7 +62,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template} !${condition}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
           }
         }
       }
@@ -74,7 +75,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${condition}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd2}'
           }
         }
       }
