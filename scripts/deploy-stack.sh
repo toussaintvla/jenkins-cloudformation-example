@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]; then
-    echo "Enter stack name & template file name to create."
+if [ $# -ne 3 ]; then
+    echo "Enter stack name & template file name to create. - You must set changeset."
     exit 0
 fi
 
@@ -20,11 +20,23 @@ if [ ! -f "parameters/$1-parameters.properties" ]; then
     exit 0
 fi
 
-aws cloudformation deploy \
---stack-name $1 \
---template-file templates/$2.yaml \
---tags file://tags/cfn-tags.properties \
---parameter-overrides file://parameters/$1-parameters.properties \
---capabilities CAPABILITY_NAMED_IAM \
---region us-east-1 \
-# --profile $3
+if [[ $3 == true ]]; then
+    aws cloudformation deploy \
+    --stack-name $1 \
+    --template-file templates/$2.yaml \
+    --tags file://tags/cfn-tags.properties \
+    --parameter-overrides file://parameters/$1-parameters.properties \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --region us-east-1 \
+    # --profile $3
+else
+    aws cloudformation deploy \
+    --stack-name $1 \
+    --template-file templates/$2.yaml \
+    --tags file://tags/cfn-tags.properties \
+    --parameter-overrides file://parameters/$1-parameters.properties \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --region us-east-1 \
+    --no-execute-changeset \
+    # --profile $3
+fi

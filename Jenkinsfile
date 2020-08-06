@@ -37,7 +37,7 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.action == 'deploy-stack' || params.action == 'delete-stack' }
+        expression { params.action == 'deploy-stack' || params.action == 'create-changeset' || params.action == 'execute-changeset' || params.action == 'delete-stack' }
       }
       steps {
         ansiColor('xterm'){
@@ -51,6 +51,32 @@ pipeline {
     stage('deploy-stack') {
       when {
         expression { params.action == 'deploy-stack' }
+      }
+      steps {
+        ansiColor('xterm') {
+            container("custom-image") {
+              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
+          }
+        }
+      }
+    }
+
+    stage('create-changeset') {
+      when {
+        expression { params.action == 'create-changeset' }
+      }
+      steps {
+        ansiColor('xterm') {
+            container("custom-image") {
+              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
+          }
+        }
+      }
+    }
+
+    stage('execute-changeset') {
+      when {
+        expression { params.action == 'execute-changeset' }
       }
       steps {
         ansiColor('xterm') {
