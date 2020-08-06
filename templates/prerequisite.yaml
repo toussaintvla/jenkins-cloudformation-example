@@ -199,8 +199,8 @@ Resources:
 # S3 Bucket to Store Templates & Artifacts
 ################################################################################################
   ArtifactsBucket:
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub ${AWS::AccountId}-templates
