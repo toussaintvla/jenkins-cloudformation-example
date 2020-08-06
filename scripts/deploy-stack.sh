@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-    echo "Enter stack name, template file name to create, & Please specify user profile."
+    echo "Enter stack name & template file name to create."
     exit 0
 fi
 
@@ -26,4 +26,5 @@ aws cloudformation deploy \
 --tags file://tags/cfn-tags.properties \
 --parameter-overrides file://parameters/$1-parameters.properties \
 --capabilities CAPABILITY_NAMED_IAM \
+--region us-east-2 \
 # --profile $3
