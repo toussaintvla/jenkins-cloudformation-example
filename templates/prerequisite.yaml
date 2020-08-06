@@ -1,0 +1,276 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Medtronic PillCam Telescope - Prerequisite"
+
+Parameters:
+  SnsTopicMasterName:
+    Type: String
+    Default: sns-topic-codepipeline-master
+  SnsTopicDevName:
+    Type: String
+    Default: sns-topic-codepipeline-dev
+  EndpointValue:
+    Type: String
+
+Resources:
+################################################################################################
+# SNS topic for Master Branch Manual Approval
+################################################################################################
+  SnsTopicMaster:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Ref SnsTopicMasterName
+      TopicName: !Ref SnsTopicMasterName
+      Subscription:
+        - Endpoint: !Ref EndpointValue
+          Protocol: sms
+
+################################################################################################
+# SNS topic for Dev Branch Manual Approval
+################################################################################################
+  SnsTopicDev:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Ref SnsTopicDevName
+      TopicName: !Ref SnsTopicDevName
+      Subscription:
+        - Endpoint: !Ref EndpointValue
+          Protocol: sms
+
+################################################################################################
+# Lambda for Stack Creation
+################################################################################################
+  CreateDockerImagePipeline:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: DockerImagePipelineCreator
+      Handler: index.lambda_handler
+      Runtime: python3.6
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 25
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+
+          def lambda_handler(event, context):
+              Region=event['region']
+              Account = event['account']
+              RepositoryName = event['detail']['repositoryName']
+              NewBranch = event['detail']['referenceName']
+              Event = event['detail']['event']
+
+              if NewBranch == "master":
+                 quit()
+
+              if Event == "referenceCreated":
+                cf_client = boto3.client('cloudformation')
+                cf_client.create_stack(
+                    StackName= f'{RepositoryName}-{NewBranch}-pipeline',
+                    TemplateURL= f'https://s3.amazonaws.com/{Account}-templates/codepipeline.yaml',
+                    Parameters=[
+                        {
+                            'ParameterKey': 'RepositoryName',
+                            'ParameterValue': RepositoryName,
+                            'UsePreviousValue': False
+                        },
+                        {
+                            'ParameterKey': 'BranchName',
+                            'ParameterValue': NewBranch,
+                            'UsePreviousValue': False
+                        }
+                    ],
+                    OnFailure='ROLLBACK',
+                    Capabilities=['CAPABILITY_NAMED_IAM', 'CAPABILITY_AUTO_EXPAND']
+                )
+              else:
+                cf_client = boto3.client('cloudformation')
+                cf_client.delete_stack(
+                    StackName= f'{RepositoryName}-{NewBranch}-pipeline'
+                  )
+              
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps(event, indent=4)
+              }
+
+################################################################################################
+# EventRule to trigger CreateDockerImagePipeline Lambda Function
+################################################################################################
+  CreatePipelineEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "EventRule - Create Docker Image Pipeline"
+      EventPattern:
+        source:
+          - aws.codecommit
+        detail-type:
+          - 'CodeCommit Repository State Change'
+        detail:
+          event:
+              - referenceDeleted
+              - referenceCreated
+          referenceType:
+            - branch
+      State: ENABLED
+      Targets:
+      - Arn: !GetAtt CreateDockerImagePipeline.Arn
+        Id: CreateDockerImagePipeline
+
+################################################################################################
+# Create Pipeline - Set permission for the services that can Invoke the Lambda function
+################################################################################################
+  LambdaInvokeImagePipelinePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CreateDockerImagePipeline
+      Action: 'lambda:InvokeFunction'
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt CreatePipelineEventRule.Arn
+
+################################################################################################
+# Role for Lambda Execution
+################################################################################################
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['-', ['pillcam-telescope', !Sub '${AWS::Region}', 'lambda-role'] ]
+      Path: !Join ['', ['/PillCamTelescope/LambdaExecutionRole', '/'] ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+################################################################################################
+# Role for Pipeline Execution
+################################################################################################
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['-', ['pillcam-telescope', !Sub '${AWS::Region}', 'codepipeline-role'] ]
+      Path: !Join ['', ['/PillCamTelescope/CodePipelineRole', '/'] ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+        - arn:aws:iam::aws:policy/AWSCodeCommitFullAccess
+        - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+        - arn:aws:iam::aws:policy/AmazonECS_FullAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+################################################################################################
+# Role for CodeBuild Execution
+################################################################################################
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['-', ['pillcam-telescope', !Sub '${AWS::Region}', 'codebuild-role'] ]
+      Path: !Join ['', ['/PillCamTelescope/CodeBuildRole', '/'] ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+################################################################################################
+# S3 Bucket to Store Templates & Artifacts
+################################################################################################
+  ArtifactsBucket:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::AccountId}-templates
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+################################################################################################
+# S3 Bucket to Store Template Policy
+################################################################################################
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:*
+            Effect: Allow
+            Resource:
+              - !Sub arn:aws:s3:::${ArtifactsBucket}
+              - !Sub arn:aws:s3:::${ArtifactsBucket}/*
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+
+################################################################################################
+# Outputs
+################################################################################################
+Outputs:
+  SnsTopicMasterName:
+    Description: 'The ARN for the Production CI/CD Pipeline'
+    Value: !Ref SnsTopicMaster
+    Export:
+      Name: SnsTopicMaster
+################################################################################################
+  SnsTopicDevName:
+    Description: 'The ARN for the Development CI/CD Pipeline'
+    Value: !Ref SnsTopicDev
+    Export:
+      Name: SnsTopicDev
+################################################################################################
+  ArtifactsBucketName:
+    Description: 'The Artifacts Bucket for Templates and CI/CD Pipeline(s)'
+    Value: !Ref ArtifactsBucket
+    Export:
+      Name: ArtifactsBucketName
+################################################################################################
+  LambdaExecutionRole:
+    Description: 'The Role used by Lambda'
+    Value: !GetAtt 'LambdaExecutionRole.Arn'
+    Export:
+      Name: PillCamTelescopeLambdaExecutionRole
+################################################################################################
+  CodePipelineRole:
+    Description: 'The Role used by CodePipeline'
+    Value: !GetAtt 'CodePipelineRole.Arn'
+    Export:
+      Name: PillCamTelescopeCodePipelineRole
+################################################################################################
+  CodeBuildRole:
+    Description: 'The Role used by CodeBuild'
+    Value: !GetAtt 'CodeBuildRole.Arn'
+    Export:
+      Name: PillCamTelescopeCodeBuildRole
+    

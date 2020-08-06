@@ -6,120 +6,67 @@ pipeline {
     }
   }  
 
-  environment {
-    var = 'sample.tfvars'
-  }
-
   parameters {
     choice(
-      choices: ['plan', 'apply' , 'show', 'preview-destroy' , 'destroy'],
-      description: 'Terraform actions',
+      choices: ['deploy-stack', 'create-changeset', 'execute-changeset' , 'delete-stack'],
+      description: 'CloudFormation Actions',
       name: 'action')
-    }
+  }
 
-    stages {
+  stages {
 
-      stage('Check Version') {
-        steps {
-          ansiColor('xterm'){
-            container("custom-image") {
-              sh 'terraform --version'
-            }
+    stage('check version') {
+      steps {
+        ansiColor('xterm') {
+          container("custom-image") {
+            sh 'aws --version'
           }
         }
       }
+    }
 
-      stage('init'){
-        steps {
-          ansiColor('xterm'){
-              container("custom-image") {
-              // cleanWs()
-                sh 'aws sts get-caller-identity'
-                sh 'terraform init -reconfigure'
-              } 
-            }
+    stage('check identity') {
+      steps {
+        ansiColor('xterm') {
+          container("custom-image") {
+            cleanWs()
+            sh 'aws sts get-caller-identity'
+          } 
+        }
+      }
+    }
+
+    stage('action') {
+      when {
+        expression { params.action == 'deploy-stack' || params.action == 'delete-stack' }
+      }
+    }
+
+    stage('deploy-stack') {
+      when {
+        expression { params.action == 'deploy-stack' }
+      }
+      steps {
+        ansiColor('xterm') {
+            container("custom-image") {
+              sh 'cd scripts/'
+              sh './deploy-stack.sh prerequisite prerequisite default'
           }
         }
+      }
+    }
 
-        stage('validate'){
-          when {
-            expression { params.action == 'preview' || params.action == 'apply' || params.action == 'destroy' }
+    stage('delete-stack') {
+      when {
+        expression { params.action == 'delete-stack' }
+      }
+      steps {
+        ansiColor('xterm') {
+          container("custom-image") {
+            sh './delete-stack.sh prerequisite default'
           }
-
-          steps {
-            ansiColor('xterm'){ 
-                container("custom-image") {
-                  sh 'terraform validate --var-file=${var}'
-                } 
-              }
-            }
-          }
-
-          stage('plan'){
-            when {
-              expression { params.action == 'plan' }
-            }
-
-            steps {
-              ansiColor('xterm'){
-                  container("custom-image") {
-                    sh 'terraform plan --var-file=${var}'
-                  }
-                }
-              }
-            }
-            stage('apply'){
-              when {
-                expression { params.action == 'apply' }
-              }
-              steps {
-                ansiColor('xterm'){
-                    container("custom-image") {
-                      sh 'aws sts get-caller-identity'
-                      sh 'terraform plan --var-file=${var}'
-                      sh 'terraform apply -auto-approve --var-file=${var}'
-                    }
-                  }
-                }
-              }
-
-              stage('show') {
-                when {
-                  expression { params.action == 'show' }
-                }
-                steps {
-                  ansiColor('xterm'){
-                      container("custom-image") {
-                        sh 'terraform show'
-                      }
-                    }
-                  }
-                }
-
-                stage('preview-destroy') {
-                  when {
-                    expression { params.action == 'preview-destroy' }
-                  }
-                  steps {
-                    ansiColor('xterm'){
-                        container("custom-image") {
-                          sh 'terraform plan -destroy --var-file=${var}'
-                        }
-                      }
-                    }
-                  }
-
-                  stage('destroy') {
-                    when {
-                      expression { params.action == 'destroy' }
-                    }
-                    steps {
-                      ansiColor('xterm'){
-                          container("custom-image") {
-                            sh 'terraform destroy -force --var-file=${var}'
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
+        }
+      }
+    }
+  }
+}
