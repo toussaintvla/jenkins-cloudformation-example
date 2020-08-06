@@ -26,5 +26,5 @@ aws cloudformation deploy \
 --tags file://tags/cfn-tags.properties \
 --parameter-overrides file://parameters/$1-parameters.properties \
 --capabilities CAPABILITY_NAMED_IAM \
---region us-east-2 \
+--region us-east-1 \
 # --profile $3
