@@ -29,7 +29,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("custom-image") {
-            cleanWs()
+            // cleanWs()
             sh 'aws sts get-caller-identity'
           } 
         }
