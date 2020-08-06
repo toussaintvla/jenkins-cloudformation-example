@@ -13,6 +13,12 @@ pipeline {
       name: 'action')
   }
 
+  environment {
+    condition: false
+    stack_name: "prerequisite"
+    template: "prerequisite"
+  }
+
   stages {
 
     stage('check version') {
@@ -55,7 +61,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite true'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${condition}'
           }
         }
       }
@@ -68,7 +74,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite false'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${condition}'
           }
         }
       }
@@ -81,7 +87,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("custom-image") {
-            sh './delete-stack.sh prerequisite'
+            sh 'scripts/delete-stack.sh ${stack_name}'
           }
         }
       }
