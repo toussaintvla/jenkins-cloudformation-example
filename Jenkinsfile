@@ -57,6 +57,7 @@ pipeline {
         ansiColor('xterm') {
             container("custom-image") {
               sh 'cd scripts/'
+              sh 'ls -l'
               sh './deploy-stack.sh prerequisite prerequisite default'
           }
         }
