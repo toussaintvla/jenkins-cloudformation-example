@@ -14,9 +14,9 @@ pipeline {
   }
 
   environment {
-    condition: false
-    stack_name: "prerequisite"
-    template: "prerequisite"
+    condition = false
+    stack_name = "prerequisite"
+    template = "prerequisite"
   }
 
   stages {
