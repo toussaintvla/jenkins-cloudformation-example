@@ -48,14 +48,14 @@ pipeline {
       }
     }
 
-    stage('deploy-stack') {
+    stage('stack-execution') {
       when {
-        expression { params.action == 'deploy-stack' }
+        expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
       }
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
+              sh 'scripts/deploy-stack.sh prerequisite prerequisite true'
           }
         }
       }
@@ -68,20 +68,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
-          }
-        }
-      }
-    }
-
-    stage('execute-changeset') {
-      when {
-        expression { params.action == 'execute-changeset' }
-      }
-      steps {
-        ansiColor('xterm') {
-            container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
+              sh 'scripts/deploy-stack.sh prerequisite prerequisite false'
           }
         }
       }
