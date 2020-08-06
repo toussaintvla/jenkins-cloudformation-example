@@ -55,7 +55,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
             container("custom-image") {
-              sh 'scripts/deploy-stack.sh prerequisite prerequisite default'
+              sh 'scripts/deploy-stack.sh prerequisite prerequisite'
           }
         }
       }
@@ -68,7 +68,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("custom-image") {
-            sh './delete-stack.sh prerequisite default'
+            sh './delete-stack.sh prerequisite'
           }
         }
       }
