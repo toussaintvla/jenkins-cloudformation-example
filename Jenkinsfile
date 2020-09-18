@@ -18,8 +18,6 @@ pipeline {
     cd2 = false
     stack_name = "example-stack"
     template = "prerequisite"
-    nonproduction = 'awsCredentialsNonProd'
-    production = 'awsCredentialsProd'
   }
 
   stages {
@@ -30,16 +28,6 @@ pipeline {
           container("custom-image") {
             sh 'aws --version'
           }
-        }
-      }
-    }
-
-    stage('check identity') {
-      steps {
-        ansiColor('xterm') {
-          container("custom-image") {
-            sh 'aws sts get-caller-identity'
-          } 
         }
       }
     }
@@ -63,12 +51,14 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
+          if ( params.action == 'deploy-stack-prod' || params.action == 'execute-changeset-prod' ) { account_env = 'awsCredentialsProd' } else { account_env = 'awsCredentialsNonProd' }
           withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${nonproduction}",
+            credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
+              sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
             }
           }
@@ -82,8 +72,15 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: "${nonproduction}",
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
+              sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd2}'
+            }
           }
         }
       }
@@ -95,8 +92,15 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
-          container("custom-image") {
-            sh 'scripts/delete-stack.sh ${stack_name}'
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: "${nonproduction}",
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+            container("custom-image") {
+              sh 'aws sts get-caller-identity'
+              sh 'scripts/delete-stack.sh ${stack_name}'
+            }
           }
         }
       }
