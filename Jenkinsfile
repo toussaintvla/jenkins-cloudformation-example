@@ -16,7 +16,7 @@ pipeline {
   environment {
     cd1 = true
     cd2 = false
-    stack_name = "prerequisite"
+    stack_name = "example-stack"
     template = "prerequisite"
     nonproduction = 'awsCredentialsNonProd'
     production = 'awsCredentialsProd'
