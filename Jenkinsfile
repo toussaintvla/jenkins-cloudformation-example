@@ -34,7 +34,10 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' }
+        expression { 
+          params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' ||
+          params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod'
+        }
       }
       steps {
         ansiColor('xterm') {
@@ -51,7 +54,7 @@ pipeline {
 
     stage('stack-execution') {
       when {
-        expression { params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' }
+        expression { params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'deploy-stack-prod' || params.action == 'execute-changeset-prod' }
       }
       steps {
         ansiColor('xterm') {
@@ -72,16 +75,17 @@ pipeline {
 
     stage('create-changeset') {
       when {
-        expression { params.action == 'create-changeset-nonprod' }
+        expression { params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' }
       }
       steps {
         ansiColor('xterm') {
           withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${nonproduction}",
+            credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
+              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd2}'
             }
@@ -92,16 +96,17 @@ pipeline {
 
     stage('delete-stack') {
       when {
-        expression { params.action == 'delete-stack-nonprod' }
+        expression { params.action == 'delete-stack-nonprod' || params.action == 'delete-stack-prod' }
       }
       steps {
         ansiColor('xterm') {
           withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${nonproduction}",
+            credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
+              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/delete-stack.sh ${stack_name}'
             }
