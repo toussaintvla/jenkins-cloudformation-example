@@ -18,6 +18,8 @@ pipeline {
     cd2 = false
     stack_name = "prerequisite"
     template = "prerequisite"
+    nonproduction = 'awsCredentialsNonProd'
+    production = 'awsCredentialsProd'
   }
 
   stages {
@@ -44,7 +46,7 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.action == 'deploy-stack' || params.action == 'create-changeset' || params.action == 'execute-changeset' || params.action == 'delete-stack' }
+        expression { params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' }
       }
       steps {
         ansiColor('xterm'){
@@ -57,12 +59,18 @@ pipeline {
 
     stage('stack-execution') {
       when {
-        expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
+        expression { params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' }
       }
       steps {
         ansiColor('xterm') {
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: "${nonproduction}",
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
+            }
           }
         }
       }
@@ -70,7 +78,7 @@ pipeline {
 
     stage('create-changeset') {
       when {
-        expression { params.action == 'create-changeset' }
+        expression { params.action == 'create-changeset-nonprod' }
       }
       steps {
         ansiColor('xterm') {
@@ -83,7 +91,7 @@ pipeline {
 
     stage('delete-stack') {
       when {
-        expression { params.action == 'delete-stack' }
+        expression { params.action == 'delete-stack-nonprod' }
       }
       steps {
         ansiColor('xterm') {

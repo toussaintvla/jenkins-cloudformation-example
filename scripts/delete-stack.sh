@@ -8,9 +8,9 @@ fi
 aws cloudformation delete-stack \
 --stack-name $1 \
 --region us-east-1 \
-# --profile $2
+
 
 aws cloudformation wait stack-delete-complete \
 --stack-name $1 \
 --region us-east-1 \
-# --profile $2
+
