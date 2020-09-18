@@ -61,6 +61,7 @@ pipeline {
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
+              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
             }
