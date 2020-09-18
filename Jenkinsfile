@@ -37,9 +37,13 @@ pipeline {
         expression { params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' }
       }
       steps {
-        ansiColor('xterm'){
-          container("custom-image") {
-            sh 'ls -l'
+        ansiColor('xterm') {
+          script {
+            if ( params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' ) { 
+              account_env = 'awsCredentialsNonProd' 
+            } else { 
+              account_env = 'awsCredentialsProd' 
+            }
           }
         }
       }
@@ -51,7 +55,6 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
-          if ( params.action == 'deploy-stack-prod' || params.action == 'execute-changeset-prod' ) { account_env = 'awsCredentialsProd' } else { account_env = 'awsCredentialsNonProd' }
           withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
             credentialsId: "${account_env}",
