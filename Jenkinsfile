@@ -45,7 +45,7 @@ pipeline {
             if ( params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' ) { 
               account_env = 'awsCredentialsNonProd' 
             } else { 
-              account_env = 'awsCredentialsProd' 
+              account_env = 'awsCredentialsProd'
             }
           }
         }
@@ -64,7 +64,6 @@ pipeline {
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
-              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
             }
@@ -85,7 +84,6 @@ pipeline {
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
-              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd2}'
             }
@@ -106,7 +104,6 @@ pipeline {
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
-              sh 'echo ${account_env}'
               sh 'aws sts get-caller-identity'
               sh 'scripts/delete-stack.sh ${stack_name}'
             }
