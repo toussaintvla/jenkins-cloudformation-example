@@ -46,8 +46,8 @@ pipeline {
       steps {
         ansiColor('xterm') {
           script {
-            if ( params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' ) { 
-              account_env = 'awsCredentialsNonProd' 
+            if ( params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' ) { 
+              account_env = 'awsCredentialsNonProd'
             } else { 
               account_env = 'awsCredentialsProd'
             }
