@@ -18,8 +18,6 @@ pipeline {
   }
 
   environment {
-    changeset_mode = true
-    account_env = 'awsCredentialsNonProd'
     stack_name = "example-stack"
     template_name = "prerequisite"
   }
@@ -47,10 +45,14 @@ pipeline {
         ansiColor('xterm') {
           script {
             if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) { 
-              env.account_env = 'awsCredentialsProd'
+              account_env = 'awsCredentialsProd'
+            } else {
+              account_env = 'awsCredentialsNonProd'
             }
             if ( params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' ) {
-              env.changeset_mode = false
+              changeset_mode = false
+            } else {
+              changeset_mode = true
             }
           }
         }
