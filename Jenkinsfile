@@ -18,7 +18,7 @@ pipeline {
   }
 
   environment {
-    changeset_mode = false
+    changeset_mode = true
     account_env = 'awsCredentialsNonProd'
     stack_name = "example-stack"
     template_name = "prerequisite"
@@ -50,7 +50,7 @@ pipeline {
               account_env = 'awsCredentialsProd'
             }
             if ( params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' ) {
-              changeset_mode = true
+              changeset_mode = false
             }
           }
         }
