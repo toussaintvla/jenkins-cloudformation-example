@@ -47,10 +47,10 @@ pipeline {
         ansiColor('xterm') {
           script {
             if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) { 
-              account_env = 'awsCredentialsProd'
+              env.account_env = 'awsCredentialsProd'
             }
             if ( params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' ) {
-              changeset_mode = false
+              env.changeset_mode = false
             }
           }
         }
