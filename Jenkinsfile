@@ -72,7 +72,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${env.changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
             }
           }
         }
@@ -92,7 +92,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${env.changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
             }
           }
         }
