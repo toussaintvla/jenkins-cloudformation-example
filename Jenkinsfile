@@ -18,8 +18,6 @@ pipeline {
   }
 
   environment {
-    cd1 = true
-    cd2 = false
     stack_name = "example-stack"
     template_name = "prerequisite"
   }
@@ -51,6 +49,11 @@ pipeline {
             } else { 
               account_env = 'awsCredentialsProd'
             }
+            if ( params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'deploy-stack-prod' || params.action == 'execute-changeset-prod' ) {
+              changeset_mode = true
+            } else {
+              changeset_mode = false
+            }
           }
         }
       }
@@ -69,7 +72,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${cd1}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
             }
           }
         }
@@ -89,7 +92,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${cd2}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
             }
           }
         }
