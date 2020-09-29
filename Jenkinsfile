@@ -19,7 +19,7 @@ pipeline {
 
   environment {
     stack_name = "example-stack"
-    template_name = "prerequisite"
+    template_name = "example-template"
   }
 
   stages {
