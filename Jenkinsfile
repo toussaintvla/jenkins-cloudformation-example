@@ -8,9 +8,13 @@ pipeline {
 
   parameters {
     choice(
-      choices: ['deploy-stack', 'create-changeset', 'execute-changeset' , 'delete-stack'],
+      choices: [
+        'deploy-stack-nonprod', 'create-changeset-nonprod', 'execute-changeset-nonprod', 'delete-stack-nonprod'
+        'deploy-stack-prod', 'create-changeset-prod', 'execute-changeset-prod', 'delete-stack-prod'
+      ],
       description: 'CloudFormation Actions',
-      name: 'action')
+      name: 'action'
+    )
   }
 
   environment {
