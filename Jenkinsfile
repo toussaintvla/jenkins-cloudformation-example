@@ -45,14 +45,14 @@ pipeline {
         ansiColor('xterm') {
           script {
             if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) { 
-              account_env = 'awsCredentialsProd'
+              env.account_env = 'awsCredentialsProd'
             } else {
-              account_env = 'awsCredentialsNonProd'
+              env.account_env = 'awsCredentialsNonProd'
             }
             if ( params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' ) {
-              changeset_mode = false
+              env.changeset_mode = false
             } else {
-              changeset_mode = true
+              env.changeset_mode = true
             }
           }
         }
@@ -72,7 +72,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${env.changeset_mode}'
             }
           }
         }
@@ -92,7 +92,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${env.changeset_mode}'
             }
           }
         }
