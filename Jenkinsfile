@@ -17,7 +17,7 @@ pipeline {
     cd1 = true
     cd2 = false
     stack_name = "example-stack"
-    template = "prerequisite"
+    template_name = "prerequisite"
   }
 
   stages {
@@ -65,7 +65,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd1}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${cd1}'
             }
           }
         }
@@ -85,7 +85,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template} ${cd2}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${cd2}'
             }
           }
         }
