@@ -11,7 +11,7 @@ spec:
     runAsNonRoot: false
   containers:
   - name: custom-image
-    image: docker.io/tpatrick1496/jenkins-agent:latest
+    image: docker.io/tpatrick1496/inbound-agent:latest
     command:
     - cat
     tty: true
