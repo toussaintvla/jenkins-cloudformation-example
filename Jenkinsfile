@@ -2,9 +2,10 @@
 pipeline {
   agent {
     kubernetes {
-      yamlFile 'templates/customk8sPodTemplate.yaml'
+      yamlFile 'k8s/customk8sPodTemplate.yaml' // Declarative agents can be defined from YAML.
+      // This is a YAML representation of the Pod, to allow setting any values not supported as fields.
     }
-  }  
+  }
 
   parameters {
     choice(
@@ -19,7 +20,7 @@ pipeline {
 
   environment {
     stack_name = "example-stack"
-    template_name = "example-template"
+    template_name = "S3-Bucket"
   }
 
   stages {
@@ -36,7 +37,7 @@ pipeline {
 
     stage('action') {
       when {
-        expression { 
+        expression {
           params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' ||
           params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod'
         }

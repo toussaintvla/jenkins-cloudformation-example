@@ -1,16 +1,15 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Artifacts Bucket"
+Description: "S3 Bucket"
 
 Parameters:
   S3BucketName:
     Type: String
-    Default: artifacts-bucket
 
 Resources:
 ################################################################################################
 # S3 Bucket
 ################################################################################################
-  ArtifactsBucket:
+  S3Bucket:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Type: AWS::S3::Bucket
@@ -30,18 +29,18 @@ Resources:
 ################################################################################################
 # S3 Bucket Policy
 ################################################################################################
-  ArtifactsBucketPolicy:
+  S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref ArtifactsBucket
+      Bucket: !Ref S3Bucket
       PolicyDocument:
         Statement:
           - Action:
               - s3:*
             Effect: Allow
             Resource:
-              - !Sub arn:aws:s3:::${ArtifactsBucket}
-              - !Sub arn:aws:s3:::${ArtifactsBucket}/*
+              - !Sub arn:aws:s3:::${S3Bucket}
+              - !Sub arn:aws:s3:::${S3Bucket}/*
             Principal:
               AWS:
                 - !Sub arn:aws:iam::${AWS::AccountId}:root
@@ -50,10 +49,8 @@ Resources:
 # Outputs
 ################################################################################################
 Outputs:
-################################################################################################
   ArtifactsBucketName:
-    Description: 'The Artifacts Bucket'
-    Value: !Ref ArtifactsBucket
+    Description: 'The S3 Bucket Name'
+    Value: !Ref S3Bucket
     Export:
-      Name: ArtifactsBucketName
-    
+      Name: S3BucketName
