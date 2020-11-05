@@ -1,4 +1,3 @@
-// Nested Pipeline
 pipeline {
   agent {
     kubernetes {
