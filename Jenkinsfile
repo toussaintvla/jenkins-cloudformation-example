@@ -21,6 +21,7 @@ pipeline {
   environment {
     stack_name = "example-stack"
     template_name = "S3-Bucket"
+    region = "us-east-1"
   }
 
   stages {
@@ -73,7 +74,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -93,7 +94,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode}'
+              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -113,7 +114,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/delete-stack.sh ${stack_name}'
+              sh 'scripts/delete-stack.sh ${stack_name} ${region}'
             }
           }
         }

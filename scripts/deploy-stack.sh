@@ -1,33 +1,38 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 4 ]; then
     echo "Enter stack name & template file name to create. - You must set changeset vale (true or false)."
     exit 0
+else
+    stack_name=$1
+    template_name=$2
+    changeset_option=$3
+    region=$4
 fi
 
-if [ ! -f "cloudformation/$2.yaml" ]; then
-    echo "CloudFormation template $2.yaml does not exist"
+if [ ! -f "cloudformation/$template_name.yaml" ]; then
+    echo "CloudFormation template $template_name.yaml does not exist"
     exit 0
 fi
 
-if [ ! -f "parameters/$1-parameters.properties" ]; then
-    echo "CloudFormation parameters $1-parameters.properties does not exist"
+if [ ! -f "parameters/$stack_name-parameters.properties" ]; then
+    echo "CloudFormation parameters $stack_name-parameters.properties does not exist"
     exit 0
 fi
 
-if [[ $3 == true ]]; then
+if [[ $changeset_option == true ]]; then
     aws cloudformation deploy \
-    --stack-name $1 \
-    --template-file cloudformation/$2.yaml \
-    --parameter-overrides file://parameters/$1-parameters.properties \
+    --stack-name $stack_name \
+    --template-file cloudformation/$template_name.yaml \
+    --parameter-overrides file://parameters/$stack_name-parameters.properties \
     --capabilities CAPABILITY_NAMED_IAM \
-    --region us-east-1 \
+    --region $region
 else
     aws cloudformation deploy \
-    --stack-name $1 \
-    --template-file cloudformation/$2.yaml \
-    --parameter-overrides file://parameters/$1-parameters.properties \
+    --stack-name $stack_name \
+    --template-file cloudformation/$template_name.yaml \
+    --parameter-overrides file://parameters/$stack_name-parameters.properties \
     --capabilities CAPABILITY_NAMED_IAM \
-    --region us-east-1 \
-    --no-execute-changeset \
+    --region $region \
+    --no-execute-changeset
 fi
