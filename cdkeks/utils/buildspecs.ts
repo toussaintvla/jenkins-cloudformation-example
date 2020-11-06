@@ -113,7 +113,7 @@ export function replicateECRspec (scope: cdk.Construct, originRepo: ecr.IReposit
                         `docker push $targetImage`
                     ]
                 }
-            }  
+            }
         })
     });
 
