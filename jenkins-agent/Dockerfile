@@ -1,5 +1,7 @@
 # Pull base image.
 FROM jenkins/inbound-agent:latest
+# At the time of this build, this specific image version is being used.
+# FROM jenkins/inbound-agent:4.6-1
 
 USER root
 # RUN chown -R jenkins:jenkins /var/jenkins_home
