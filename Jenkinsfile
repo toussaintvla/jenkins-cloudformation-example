@@ -73,7 +73,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+              sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -93,7 +93,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+              sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -113,7 +113,7 @@ pipeline {
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
             container("custom-image") {
               sh 'aws sts get-caller-identity'
-              sh 'scripts/delete-stack.sh ${stack_name} ${region}'
+              sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
             }
           }
         }

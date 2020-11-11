@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Please ensure that you have the correct AWS credentials configured.
+# Enter the name of the stack, the template name, then changeset condition, and finally the region name.
+
 if [ $# -ne 4 ]; then
-    echo "Enter stack name & template file name to create. - You must set changeset vale (true or false)."
+    echo "Enter stack name, template file name to create, set changeset vale (true or false), and enter region name. "
     exit 0
 else
     stack_name=$1
