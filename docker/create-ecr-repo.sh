@@ -15,3 +15,8 @@ aws ecr create-repository \
 --repository-name $repository_name \
 --image-scanning-configuration scanOnPush=true \
 --region $region
+
+aws ecr set-repository-policy \
+--repository-name $repository_name \
+--policy-text file://ecr-permission-policy.json \
+--region $region
