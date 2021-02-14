@@ -16,7 +16,7 @@ pipeline {
           'us-east-1',
           'us-east-2'
           ],
-      description: 'CloudFormation Actions'
+      description: 'AWS Account Region'
     )
     choice(
       name: 'action',
