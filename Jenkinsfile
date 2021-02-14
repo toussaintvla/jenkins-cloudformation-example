@@ -9,7 +9,7 @@ pipeline {
   parameters {
     string(name: 'stack_name', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name')
     string(name: 'template_name', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type.)')
-    string(name: 'account_env', defaultValue: '', description: 'AWS Account ID')
+    credentials(name: 'cfnCredentialsId', defaultValue: '', description: 'AWS Account ID', required: true)
     choice(
       name: 'region',
       choices: [
@@ -65,7 +65,7 @@ pipeline {
           container("jenkins-agent") {
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${account_env}",
+              credentialsId: "${cfnCredentialsId}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws sts get-caller-identity'
@@ -86,7 +86,7 @@ pipeline {
               sh 'aws sts get-caller-identity'
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${account_env}",
+              credentialsId: "${cfnCredentialsId}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws sts get-caller-identity'
@@ -106,7 +106,7 @@ pipeline {
           container("jenkins-agent") {
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${account_env}",
+              credentialsId: "${cfnCredentialsId}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws sts get-caller-identity'
