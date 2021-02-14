@@ -31,10 +31,10 @@ pipeline {
     stage('check version') {
       steps {
         ansiColor('xterm') {
-          container("jenkins-agent") {
+        //   container("jenkins-agent") {
             sh 'aws --version'
             sh 'aws sts get-caller-identity'
-          }
+        //   }
         }
       }
     }
@@ -83,8 +83,6 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("jenkins-agent") {
-              sh 'aws sts get-caller-identity'
-              sh 'echo ${cfnCredentialsId}'
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
               credentialsId: "${cfnCredentialsId}",
