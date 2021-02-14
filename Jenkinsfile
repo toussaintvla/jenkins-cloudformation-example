@@ -62,14 +62,14 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
-          withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${account_env}",
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("jenkins-agent") {
-              sh 'aws sts get-caller-identity'
-              sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+          container("jenkins-agent") {
+            withCredentials([[
+              $class: 'AmazonWebServicesCredentialsBinding',
+              credentialsId: "${account_env}",
+              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                sh 'aws sts get-caller-identity'
+                sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -82,14 +82,14 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
-          withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${account_env}",
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("jenkins-agent") {
-              sh 'aws sts get-caller-identity'
-              sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+          container("jenkins-agent") {
+            withCredentials([[
+              $class: 'AmazonWebServicesCredentialsBinding',
+              credentialsId: "${account_env}",
+              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                sh 'aws sts get-caller-identity'
+                sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
           }
         }
@@ -102,14 +102,14 @@ pipeline {
       }
       steps {
         ansiColor('xterm') {
-          withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "${account_env}",
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("jenkins-agent") {
-              sh 'aws sts get-caller-identity'
-              sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
+          container("jenkins-agent") {
+            withCredentials([[
+              $class: 'AmazonWebServicesCredentialsBinding',
+              credentialsId: "${account_env}",
+              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                sh 'aws sts get-caller-identity'
+                sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
             }
           }
         }
