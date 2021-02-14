@@ -1,11 +1,8 @@
-FROM jenkins/jenkins:latest
-# At the time of this build, this specific image version is being used.
-# FROM jenkins/jenkins:2.266
+FROM jenkins/jenkins:lts
 
 USER root
-# RUN chown -R jenkins:jenkins /var/jenkins_home
 
-# Install packages
+# install packages
 RUN apt-get -y update \
     && apt-get -y upgrade \
     && apt-get -y install sudo curl bash jq python3 python3-pip
@@ -31,6 +28,9 @@ RUN set +x \
 # install Additional Plugins
 RUN set +x \
     && /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins_dev.txt
+
+# change directory owner for jenkins home
+RUN chown -R jenkins:jenkins /var/jenkins_home
 
 # drop back to the regular jenkins user - good practice
 USER jenkins

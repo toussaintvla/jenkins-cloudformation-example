@@ -1,8 +1,8 @@
 pipeline {
   agent {
     kubernetes {
+    // This is a YAML representation of the Pod, to allow setting any values not supported as fields.
       yamlFile 'k8s/k8sPodTemplate.yaml' // Declarative agents can be defined from YAML.
-      // This is a YAML representation of the Pod, to allow setting any values not supported as fields.
     }
   }
 
@@ -28,7 +28,7 @@ pipeline {
     stage('check version') {
       steps {
         ansiColor('xterm') {
-          container("custom-image") {
+          container("jenkins-agent") {
             sh 'aws --version'
           }
         }
@@ -45,7 +45,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           script {
-            if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) { 
+            if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) {
               env.account_env = 'awsCredentialsProd'
             } else {
               env.account_env = 'awsCredentialsNonProd'
@@ -71,7 +71,7 @@ pipeline {
             credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("custom-image") {
+            container("jenkins-agent") {
               sh 'aws sts get-caller-identity'
               sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
@@ -91,7 +91,7 @@ pipeline {
             credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("custom-image") {
+            container("jenkins-agent") {
               sh 'aws sts get-caller-identity'
               sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
             }
@@ -111,7 +111,7 @@ pipeline {
             credentialsId: "${account_env}",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-            container("custom-image") {
+            container("jenkins-agent") {
               sh 'aws sts get-caller-identity'
               sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
             }
