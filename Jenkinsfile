@@ -7,20 +7,23 @@ pipeline {
   }
 
   parameters {
+    string(name: 'stack_name', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name')
+    string(name: 'template_name', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type.)')
+    string(name: 'account_env', defaultValue: '', description: 'AWS Account ID')
     choice(
+      name: 'region',
       choices: [
-        'deploy-stack-nonprod', 'create-changeset-nonprod', 'execute-changeset-nonprod', 'delete-stack-nonprod',
-        'deploy-stack-prod', 'create-changeset-prod', 'execute-changeset-prod', 'delete-stack-prod'
-      ],
-      description: 'CloudFormation Actions',
-      name: 'action'
+          'us-east-1',
+          'us-east-2'
+          ],
+      description: 'CloudFormation Actions'
     )
-  }
-
-  environment {
-    stack_name = "example-stack"
-    template_name = "S3-Bucket"
-    region = "us-east-1"
+    choice(
+      name: 'action',
+      choices: ['deploy-stack', 'create-changeset', 'execute-changeset', 'delete-stack'],
+      description: 'CloudFormation Actions'
+    )
+    booleanParam(name: 'TOGGLE', defaultValue: false, description: 'Are you sure you want to perform this action?')
   }
 
   stages {
@@ -37,20 +40,12 @@ pipeline {
 
     stage('action') {
       when {
-        expression {
-          params.action == 'deploy-stack-nonprod' || params.action == 'create-changeset-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'delete-stack-nonprod' ||
-          params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod'
-        }
+        expression { params.action == 'create-changeset' }
       }
       steps {
         ansiColor('xterm') {
           script {
-            if ( params.action == 'deploy-stack-prod' || params.action == 'create-changeset-prod' || params.action == 'execute-changeset-prod' || params.action == 'delete-stack-prod' ) {
-              env.account_env = 'awsCredentialsProd'
-            } else {
-              env.account_env = 'awsCredentialsNonProd'
-            }
-            if ( params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' ) {
+            if (params.action == 'create-changeset') {
               env.changeset_mode = false
             } else {
               env.changeset_mode = true
@@ -62,7 +57,7 @@ pipeline {
 
     stage('stack-execution') {
       when {
-        expression { params.action == 'deploy-stack-nonprod' || params.action == 'execute-changeset-nonprod' || params.action == 'deploy-stack-prod' || params.action == 'execute-changeset-prod' }
+        expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
       }
       steps {
         ansiColor('xterm') {
@@ -82,7 +77,7 @@ pipeline {
 
     stage('create-changeset') {
       when {
-        expression { params.action == 'create-changeset-nonprod' || params.action == 'create-changeset-prod' }
+        expression { params.action == 'create-changeset' }
       }
       steps {
         ansiColor('xterm') {
@@ -102,7 +97,7 @@ pipeline {
 
     stage('delete-stack') {
       when {
-        expression { params.action == 'delete-stack-nonprod' || params.action == 'delete-stack-prod' }
+        expression { params.action == 'delete-stack' }
       }
       steps {
         ansiColor('xterm') {
@@ -119,5 +114,6 @@ pipeline {
         }
       }
     }
+
   }
 }
