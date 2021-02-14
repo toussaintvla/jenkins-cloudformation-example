@@ -85,6 +85,7 @@ pipeline {
         ansiColor('xterm') {
           container("jenkins-agent") {
               sh 'aws sts get-caller-identity'
+              sh 'echo ${cfnCredentialsId}'
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
               credentialsId: "${cfnCredentialsId}",
@@ -92,7 +93,7 @@ pipeline {
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh 'aws sts get-caller-identity'
                 sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
-            // }
+            }
           }
         }
       }
