@@ -20,7 +20,6 @@ pipeline {
     )
     choice(
       name: 'action',
-      defaultValue: '',
       choices: ['deploy-stack', 'create-changeset', 'execute-changeset', 'delete-stack'],
       description: 'CloudFormation Actions'
     )
