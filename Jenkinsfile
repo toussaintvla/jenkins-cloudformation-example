@@ -31,10 +31,10 @@ pipeline {
     stage('check version') {
       steps {
         ansiColor('xterm') {
-        //   container("jenkins-agent") {
+          container("jenkins-agent") {
             sh 'aws --version'
             sh 'aws sts get-caller-identity'
-        //   }
+          }
         }
       }
     }
@@ -56,25 +56,25 @@ pipeline {
       }
     }
 
-    stage('stack-execution') {
-      when {
-        expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
-      }
-      steps {
-        ansiColor('xterm') {
-          container("jenkins-agent") {
-            withCredentials([[
-              $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${cfnCredentialsId}",
-              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'aws sts get-caller-identity'
-                sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
-            }
-          }
-        }
-      }
-    }
+    // stage('stack-execution') {
+    //   when {
+    //     expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
+    //   }
+    //   steps {
+    //     ansiColor('xterm') {
+    //       container("jenkins-agent") {
+    //         withCredentials([[
+    //           $class: 'AmazonWebServicesCredentialsBinding',
+    //           credentialsId: "${cfnCredentialsId}",
+    //           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+    //           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+    //             sh 'aws sts get-caller-identity'
+    //             sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
     stage('create-changeset') {
       when {
@@ -96,25 +96,25 @@ pipeline {
       }
     }
 
-    stage('delete-stack') {
-      when {
-        expression { params.action == 'delete-stack' }
-      }
-      steps {
-        ansiColor('xterm') {
-          container("jenkins-agent") {
-            withCredentials([[
-              $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${cfnCredentialsId}",
-              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'aws sts get-caller-identity'
-                sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
-            }
-          }
-        }
-      }
-    }
+    // stage('delete-stack') {
+    //   when {
+    //     expression { params.action == 'delete-stack' }
+    //   }
+    //   steps {
+    //     ansiColor('xterm') {
+    //       container("jenkins-agent") {
+    //         withCredentials([[
+    //           $class: 'AmazonWebServicesCredentialsBinding',
+    //           credentialsId: "${cfnCredentialsId}",
+    //           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+    //           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+    //             sh 'aws sts get-caller-identity'
+    //             sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
   }
 }
