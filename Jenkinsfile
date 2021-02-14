@@ -83,6 +83,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("jenkins-agent") {
+              sh 'aws sts get-caller-identity'
             withCredentials([[
               $class: 'AmazonWebServicesCredentialsBinding',
               credentialsId: "${account_env}",
