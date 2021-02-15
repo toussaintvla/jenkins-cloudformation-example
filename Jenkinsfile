@@ -7,11 +7,11 @@ pipeline {
   }
 
   parameters {
-    string(name: 'stack_name', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name')
-    string(name: 'template_name', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type.)')
-    credentials(name: 'cfnCredentialsId', defaultValue: '', description: 'AWS Account ID', required: true)
+    string(name: 'STACK_NAME', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name.')
+    string(name: 'TEMPLATE_NAME', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type.)')
+    credentials(name: 'CFN_CREDENTIALS_ID', defaultValue: '', description: 'AWS Account Role.', required: true)
     choice(
-      name: 'region',
+      name: 'REGION',
       choices: [
           'us-east-1',
           'us-east-2'
@@ -19,8 +19,8 @@ pipeline {
       description: 'AWS Account Region'
     )
     choice(
-      name: 'action',
-      choices: ['deploy-stack', 'create-changeset', 'execute-changeset', 'delete-stack'],
+      name: 'ACTION',
+      choices: ['create-changeset', 'execute-changeset', 'deploy-stack', 'delete-stack'],
       description: 'CloudFormation Actions'
     )
     booleanParam(name: 'TOGGLE', defaultValue: false, description: 'Are you sure you want to perform this action?')
@@ -41,15 +41,15 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.action == 'create-changeset' }
+        expression { params.ACTION == 'create-changeset' }
       }
       steps {
         ansiColor('xterm') {
           script {
-            if (params.action == 'create-changeset') {
-              env.changeset_mode = false
+            if (params.ACTION == 'create-changeset') {
+              env.CHANGESET_MODE = false
             } else {
-              env.changeset_mode = true
+              env.CHANGESET_MODE = true
             }
           }
         }
@@ -58,18 +58,18 @@ pipeline {
 
     // stage('stack-execution') {
     //   when {
-    //     expression { params.action == 'deploy-stack' || params.action == 'execute-changeset' }
+    //     expression { params.ACTION == 'deploy-stack' || params.ACTION == 'execute-changeset' }
     //   }
     //   steps {
     //     ansiColor('xterm') {
     //       container("jenkins-agent") {
     //         withCredentials([[
     //           $class: 'AmazonWebServicesCredentialsBinding',
-    //           credentialsId: "${cfnCredentialsId}",
+    //           credentialsId: "${CFN_CREDENTIALS_ID}",
     //           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
     //           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
     //             sh 'aws sts get-caller-identity'
-    //             sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
+    //             sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
     //         }
     //       }
     //     }
@@ -78,19 +78,15 @@ pipeline {
 
     stage('create-changeset') {
       when {
-        expression { params.action == 'create-changeset' }
+        expression { params.ACTION == 'create-changeset' }
       }
       steps {
         ansiColor('xterm') {
           container("jenkins-agent") {
-            withCredentials([[
-              $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${cfnCredentialsId}",
-              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'aws sts get-caller-identity'
-                sh 'cloudformation/deploy-stack.sh ${stack_name} ${template_name} ${changeset_mode} ${region}'
-            }
+            sh 'aws sts get-caller-identity'
+            sh 'cloudformation/switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}'
+            sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+            sh 'aws sts get-caller-identity'
           }
         }
       }
@@ -98,18 +94,18 @@ pipeline {
 
     // stage('delete-stack') {
     //   when {
-    //     expression { params.action == 'delete-stack' }
+    //     expression { params.ACTION == 'delete-stack' }
     //   }
     //   steps {
     //     ansiColor('xterm') {
     //       container("jenkins-agent") {
     //         withCredentials([[
     //           $class: 'AmazonWebServicesCredentialsBinding',
-    //           credentialsId: "${cfnCredentialsId}",
+    //           credentialsId: "${CFN_CREDENTIALS_ID}",
     //           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
     //           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
     //             sh 'aws sts get-caller-identity'
-    //             sh 'cloudformation/delete-stack.sh ${stack_name} ${region}'
+    //             sh 'cloudformation/delete-stack.sh ${STACK_NAME} ${REGION}'
     //         }
     //       }
     //     }
