@@ -23,7 +23,6 @@ pipeline {
       choices: ['create-changeset', 'execute-changeset', 'deploy-stack', 'delete-stack'],
       description: 'CloudFormation Actions'
     )
-    booleanParam(name: 'Are you sure you want to perform this action?', defaultValue: false)
   }
 
   stages {
