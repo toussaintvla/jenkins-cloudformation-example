@@ -48,7 +48,8 @@ pipeline {
           script {
             if (params.ACTION == 'create-changeset') {
               env.CHANGESET_MODE = false
-            } else {
+            }
+            if (params.ACTION == 'execute-changeset' || params.ACTION == 'deploy-stack') {
               env.CHANGESET_MODE = true
             }
           }
