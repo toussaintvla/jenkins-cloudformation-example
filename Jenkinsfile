@@ -7,7 +7,7 @@ pipeline {
   }
 
   parameters {
-    string(name: 'STACK_NAME', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name (Do not append file extension type).')
+    string(name: 'STACK_NAME', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name.')
     string(name: 'TEMPLATE_NAME', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type).')
     credentials(name: 'CFN_CREDENTIALS_ID', defaultValue: '', description: 'AWS Account Role.', required: true)
     choice(
