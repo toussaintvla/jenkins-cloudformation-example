@@ -41,15 +41,14 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.ACTION == 'create-changeset' }
+        expression { params.ACTION == 'create-changeset' || params.ACTION == 'execute-changeset' || params.ACTION == 'deploy-stack' }
       }
       steps {
         ansiColor('xterm') {
           script {
             if (params.ACTION == 'create-changeset') {
               env.CHANGESET_MODE = false
-            }
-            if (params.ACTION == 'execute-changeset' || params.ACTION == 'deploy-stack') {
+            } else {
               env.CHANGESET_MODE = true
             }
           }
