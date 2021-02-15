@@ -3,18 +3,15 @@
 # Please ensure that you have the correct AWS credentials configured.
 # Enter the name of the stack, the template name, then changeset condition, and finally the region name.
 
-if [ $# -ne 5 ]; then
+if [ $# -ne 4 ]; then
     echo "Enter stack name, template file name to create, set changeset value (true or false), role arn, and enter region name. "
     exit 0
 else
     STACK_NAME=$1
     TEMPLATE_NAME=$2
     CHANGESET_MODE=$3
-    CFN_CREDENTIALS_ID=$4
-    REGION=$5
+    REGION=$4
 fi
-
-./cloudformation/switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}
 
 if [ ! -f "cloudformation/$TEMPLATE_NAME.yaml" ]; then
     echo "CloudFormation template $TEMPLATE_NAME.yaml does not exist"
