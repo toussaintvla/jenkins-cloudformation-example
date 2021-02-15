@@ -46,15 +46,14 @@ pipeline {
       steps {
         ansiColor('xterm') {
           script {
-            if (params.TOGGLE) {
-                currentBuild.result = 'STABLE'
+            if (!params.TOGGLE) {
+                currentBuild.result = 'ABORTED'
+            } else {
                 if (params.ACTION == 'create-changeset') {
                     env.CHANGESET_MODE = false
                 } else {
                     env.CHANGESET_MODE = true
                 }
-            } else {
-                currentBuild.result = 'ABORTED'
             }
           }
         }
