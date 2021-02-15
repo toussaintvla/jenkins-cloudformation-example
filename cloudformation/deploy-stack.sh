@@ -14,7 +14,7 @@ else
     REGION=$5
 fi
 
-source switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}
+./cloudformation/switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}
 
 if [ ! -f "cloudformation/$TEMPLATE_NAME.yaml" ]; then
     echo "CloudFormation template $TEMPLATE_NAME.yaml does not exist"
