@@ -23,6 +23,7 @@ pipeline {
       choices: ['create-changeset', 'execute-changeset', 'deploy-stack', 'delete-stack'],
       description: 'CloudFormation Actions'
     )
+    booleanParam(name: 'TOGGLE', defaultValue: false, description: 'Are you sure you want to perform this action?')
   }
 
   stages {
@@ -40,15 +41,20 @@ pipeline {
 
     stage('action') {
       when {
-        expression { params.ACTION == 'create-changeset' || params.ACTION == 'execute-changeset' || params.ACTION == 'deploy-stack' }
+        expression { params.ACTION == 'create-changeset' || params.ACTION == 'execute-changeset' || params.ACTION == 'deploy-stack' || params.ACTION == 'delete-stack'}
       }
       steps {
         ansiColor('xterm') {
           script {
-            if (params.ACTION == 'create-changeset') {
-              env.CHANGESET_MODE = false
+            if (params.TOGGLE) {
+                currentBuild.result = 'STABLE'
+                if (params.ACTION == 'create-changeset') {
+                    env.CHANGESET_MODE = false
+                } else {
+                    env.CHANGESET_MODE = true
+                }
             } else {
-              env.CHANGESET_MODE = true
+                currentBuild.result = 'ABORTED'
             }
           }
         }
