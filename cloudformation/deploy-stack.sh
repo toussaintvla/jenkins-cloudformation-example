@@ -4,7 +4,7 @@
 # Enter the name of the stack, the template name, then changeset condition, and finally the region name.
 
 if [ $# -ne 4 ]; then
-    echo "Enter stack name, template file name to create, set changeset value (true or false), role arn, and enter region name. "
+    echo "Enter stack name, template file name to create, set changeset value (true or false), and enter region name. "
     exit 0
 else
     STACK_NAME=$1
