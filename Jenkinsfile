@@ -83,11 +83,7 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("jenkins-agent") {
-            sh 'aws sts get-caller-identity'
-            sh 'cloudformation/switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}'
-            sh 'aws sts get-caller-identity'
-            sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
-
+            sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${CFN_CREDENTIALS_ID} ${REGION}'
           }
         }
       }
