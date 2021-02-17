@@ -8,7 +8,8 @@ pipeline {
 
   parameters {
     string(name: 'STACK_NAME', defaultValue: 'example-stack', description: 'Enter the CloudFormation Stack Name.')
-    string(name: 'TEMPLATE_NAME', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append file extension type).')
+    string(name: 'PARAMETERS_FILE_NAME', defaultValue: 'example-stack-parameters', description: 'Enter the Parameters File Name (Do not append any file extension type. e.g. .properties)')
+    string(name: 'TEMPLATE_NAME', defaultValue: 'S3-Bucket', description: 'Enter the CloudFormation Template Name (Do not append any file extension type. e.g. yml or .yaml)')
     credentials(name: 'CFN_CREDENTIALS_ID', defaultValue: '', description: 'AWS Account Role.', required: true)
     choice(
       name: 'REGION',
@@ -47,7 +48,7 @@ pipeline {
         ansiColor('xterm') {
           script {
             if (!params.TOGGLE) {
-                currentBuild.result = 'ABORTED'
+                currentBuild.result = 'ABORTED' //If you do not set the toggle flag to true before executing the build action, it will automatically abort the pipeline for any action.
             } else {
                 if (params.ACTION == 'create-changeset') {
                     env.CHANGESET_MODE = false
@@ -72,7 +73,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
             }
           }
         }
@@ -91,7 +92,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
             }
           }
         }
