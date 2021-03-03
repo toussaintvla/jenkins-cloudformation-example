@@ -14,6 +14,7 @@ pipeline {
     choice(
       name: 'REGION',
       choices: [
+          ' ',
           'us-east-1',
           'us-east-2'
           ],
