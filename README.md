@@ -90,7 +90,7 @@ Verify if the AWS CLI was installed by executing this command in your terminal `
 
 ```bash
 # Clone the git repository
-~ git clone https://gitlab.aws.dev/toussaiv/jenkins-cloudformation-example
+~ git clone https://github.com/aws-samples/jenkins-cloudformation-deployment-example.git
 ```
 
 - The following parameters is an example which will vary based on your preference. If you choose to deploy with a different name, region, zone, or node capacity please modify accordingly.
@@ -369,10 +369,10 @@ aws cloudformation wait stack-delete-complete \
 
 ```bash
 # Deploy a Stack or Execute a Changeset
-~ cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}
+~ scripts/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}
 
 # Delete a CloudFormation Stack
-~ cloudformation/delete-stack.sh ${STACK_NAME} ${REGION}
+~ scripts/delete-stack.sh ${STACK_NAME} ${REGION}
 ```
 
 - The steps in the pipeline will execute based on the parameter choices you select.
@@ -394,6 +394,7 @@ pipeline {
     choice(
       name: 'REGION',
       choices: [
+          ' ',
           'us-east-1',
           'us-east-2'
           ],
@@ -453,7 +454,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+                sh 'scripts/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
             }
           }
         }
@@ -472,7 +473,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+                sh 'scripts/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
             }
           }
         }
@@ -491,7 +492,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/delete-stack.sh ${STACK_NAME} ${REGION}'
+                sh 'scripts/delete-stack.sh ${STACK_NAME} ${REGION}'
             }
           }
         }
@@ -526,7 +527,7 @@ pipeline {
 
 ## Code Repository
 
-- [Amazon EKS Jenkins Integration](https://gitlab.aws.dev/toussaiv/jenkins-cloudformation-example)
+- [Amazon EKS Jenkins Integration](https://github.com/aws-samples/jenkins-cloudformation-deployment-example.git)
 
 ## References
 
