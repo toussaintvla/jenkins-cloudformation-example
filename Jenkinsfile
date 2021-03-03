@@ -74,7 +74,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
+                sh 'scripts/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
             }
           }
         }
@@ -88,13 +88,8 @@ pipeline {
       steps {
         ansiColor('xterm') {
           container("jenkins-agent") {
-            withCredentials([[
-              $class: 'AmazonWebServicesCredentialsBinding',
-              credentialsId: "${CFN_CREDENTIALS_ID}",
-              accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-              secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
-            }
+            sh 'source scripts/switch-role.sh ${CFN_CREDENTIALS_ID} ${REGION}'
+            sh 'scripts/deploy-stack.sh ${STACK_NAME} ${PARAMETERS_FILE_NAME} ${TEMPLATE_NAME} ${CHANGESET_MODE} ${REGION}'
           }
         }
       }
@@ -112,7 +107,7 @@ pipeline {
               credentialsId: "${CFN_CREDENTIALS_ID}",
               accessKeyVariable: 'AWS_ACCESS_KEY_ID',
               secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh 'cloudformation/delete-stack.sh ${STACK_NAME} ${REGION}'
+                sh 'scripts/delete-stack.sh ${STACK_NAME} ${REGION}'
             }
           }
         }
