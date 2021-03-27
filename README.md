@@ -525,6 +525,53 @@ pipeline {
 ![Image: img/jenkins-08.png](img/jenkins-08.png)
 *Figure 10. Watch Jenkins Agent Pods Spawn*
 
+## Security Considerations
+
+This blog provides a high level overview of the best practices for cross-account deployment and maintaining the isolation between the applications. We evaluated the cross-account application deployment permissions and will describe the current state and what you should avoid as part of the security best practices.
+
+### Best Practice - *Current State*
+
+We implemented the use of cross-account roles that can restrict unauthorized access across build jobs. Behind this approach, we will utilize the concept of assume-role that will enable the requesting role to obtain temporary credentials (from STS service) of the target role and execute actions permitted by the target
+role. This is a safer approach than using hard-coded credentials. The requesting role could be either the inherited EC2 instance role OR specific user credentials, but in our case we are using the inherited EC2 instance role.
+
+For ease of understanding, we will refer the target-role as execution-role below.
+
+![Image: img/current-state.png](img/current-state.png)
+*Figure 11. Current State*
+
+#### *Step 1*
+
+As per the security best practice of assigning minimum privileges, it is required to first create
+execution role in IAM in the target account that has deployment permissions (either via
+CloudFormation OR via CLI’s). eg. app-dev-role in Dev account and app-prod-role in Prod account.
+
+#### *Step 2*
+
+For each of those roles, we configure a trust relationship with the parent account ID (Shared Services account). This will enable any roles in the Shared account (with assume-role permission) to assume the role of the execution role and deploy it on respective hosting infrastructure. eg. app-dev-role in Dev account will be a common execution role that will deploy various apps across infrastructure.
+
+#### *Step 3*
+
+Then we create a local role in the Shared Services account and configure credentials within Jenkins to be utilized by the Build Jobs. Provide the job with the assume-role permissions and specify the list of ARN’s across all the accounts. Alternatively, the inherited EC2 instance role can also be utilized to assume the role of execution-role.
+
+---
+
+### Bad Practice - *Avoid this approach*
+
+As per our understanding, there is a Jenkins manager that is running as a container in an EC2 compute instance which resides within a Shared AWS account. This Jenkins application has multiple build jobs that builds application and deploys it to multiple environments that resides in separate AWS accounts. The cross-account deployment uses the admin credentials of the target AWS account to do the deployment.
+
+![Image: img/bad-practice.png](img/bad-practice.png)
+*Figure 12. Bad Practice*
+
+#### *Problem statement*
+
+With the above methodology, it is not a good practice to share the account credentials externally. Additionally, there is a need to eliminate the risk of the deployment errors and maintain application isolation within the same account.
+
+As shown above in the diagram, build-job-1 is responsible to build app1 and deploy in its hosting infrastructure (shown in blue), whereas build-job-2 is responsible to build app2 and deploy in its hosting infrastructure (shown in yellow). However, there are no restrictions for build-job-1 to deploy on the hosting infrastructure of app2.
+
+Note that the deployment steps are being run using aws cli’s and thus our solution will be focused around usage of aws cli.
+
+The risk is much lower when using CloudFormation / CDK to carry out deployments because the aws CLI’s executed from the build jobs will specify stack names as parametrized inputs and very low probability of stack-name error. However, it is still not a good practice to use admin credentials, that too of the target account.
+
 ## Code Repository
 
 - [Amazon EKS Jenkins Integration](https://github.com/aws-samples/jenkins-cloudformation-deployment-example.git)
